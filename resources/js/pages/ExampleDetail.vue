@@ -15,10 +15,14 @@ const api = require('../api')
 export default {
   data: () => ({
     item: {
-      id: null,
+      id: '',
       value: ''
     }
   }),
+  mixins: [
+    // HTTPステータスチェックmixin
+    require('../mixins/statusCodeCheck').default
+  ],
   props: {
     id: {
       type: String,
@@ -27,9 +31,12 @@ export default {
   },
   methods: {
     async load () {
-      const item = await api.getDetail('tests', this.id)
-      this.item.id = item.id
-      this.item.value = item.value
+      const response = await api.getDetail('tests', this.id)
+
+      this.checkGetResponseStatusCode(response.status)
+
+      this.item.id = response.data.id
+      this.item.value = response.data.value
     }
   },
   mounted () {

@@ -14,6 +14,37 @@ export const ResourceName = Object.freeze([
 ])
 
 /**
+ * axios のエラー時にレスポンスに記載された情報を返します。
+ * @param {Object} err axios のエラーオブジェクト
+ * @returns 呼び出し元に返すオブジェクト
+ */
+function handleErrorResponse (err) {
+  const result = {
+    success: false,
+    error: true,
+    status: null,
+    statusText: null,
+    message: null,
+    data: null
+  }
+  if (err.response) {
+    result.status = err.response.status
+    result.statusText = err.response.statusText
+    const data = err.response.data
+    if (data instanceof Array) {
+      // データが配列の場合
+      const more = data.length > 3 ? '\n...' : ''
+      result.message = data.slice(0, 3).join('\n') + more
+    } else if (toString.apply(data) === '[object String]') {
+      result.message = data
+    } else {
+      result.message = JSON.stringify(data)
+    }
+  }
+  return result
+}
+
+/**
  * 指定したリソースの一覧を取得します.
  * @param {string} resourceName リソース名 (値を指定するには ResourceName 列挙体を使用してください)
  * @returns {Promise} リソースのデータを返す Promise
@@ -25,7 +56,13 @@ export function getIndex (resourceName) {
   }
   return client
     .get(`${resourceName}`)
-    .then(l => l.data)
+    .then(response => {
+      return {
+        status: response.status,
+        data: response.data
+      }
+    })
+    .catch(handleErrorResponse)
 }
 
 /**
@@ -38,5 +75,11 @@ export function getIndex (resourceName) {
 export function getDetail (resourceName, id) {
   return client
     .get(`${resourceName}/${id}`)
-    .then(l => l.data)
+    .then(response => {
+      return {
+        status: response.status,
+        data: response.data
+      }
+    })
+    .catch(handleErrorResponse)
 }
