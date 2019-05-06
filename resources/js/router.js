@@ -5,7 +5,6 @@ import Login from './pages/Login.vue'
 import ExampleList from './pages/ExampleList.vue'
 import ExampleDetail from './pages/ExampleDetail.vue'
 import ExampleCreate from './pages/ExampleCreate.vue'
-import ExampleEdit from './pages/ExampleEdit.vue'
 import SystemError from './pages/errors/System.vue'
 import NotFound from './pages/errors/NotFound.vue'
 
@@ -28,6 +27,10 @@ const routes = [
   {
     path: '/',
     component: ExampleList,
+    props: route => {
+      const page = route.query.page
+      return { page: /^[1-9][0-9]*$/.test(page) ? page * 1 : 1 }
+    },
     meta: { requiresAuth: true }
   },
   {
@@ -42,12 +45,6 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/items/edit/:id',
-    component: ExampleEdit,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/500',
     component: SystemError
   },
@@ -59,6 +56,9 @@ const routes = [
 
 const router = new VueRouter({
   mode: 'history',
+  scrollBehavior () {
+    return { x: 0, y: 0 }
+  },
   routes
 })
 

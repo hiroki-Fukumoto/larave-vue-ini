@@ -26,7 +26,7 @@ class TestRepository
      */
     public function getList()
     {
-        return $this->test->all();
+        return $this->test->paginate();
     }
 
 
