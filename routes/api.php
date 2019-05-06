@@ -24,6 +24,9 @@ Route::group(['middleware' => 'auth'], function () {
     })->name('user');
 
     // テストデータ
-    Route::get('/tests', 'Api\TestController@index');
-    Route::get('/tests/{id}', 'Api\TestController@show');
+    Route::get('/tests', 'Api\TestController@index')->name('test.index');
+    Route::get('/tests/{id}', 'Api\TestController@show')->name('test.show');
+    Route::post('/tests', 'Api\TestController@store')->name('test.store');
+    Route::patch('/tests/{id}', 'Api\TestController@update')->name('test.update');
+    Route::delete('/tests/{id}', 'Api\TestController@delete')->name('test.delete');
 });

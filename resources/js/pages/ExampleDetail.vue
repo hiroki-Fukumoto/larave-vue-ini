@@ -1,28 +1,85 @@
 <template>
   <div>
-    <div class="card">
+    <div class="text-right">
+      <div v-if="isEditing">
+        <button
+          v-if="isEditing"
+          class="btn btn-light"
+          @click="onCancel"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn btn-danger"
+          @click="onDelete"
+        >
+          Delete
+        </button>
+      </div>
+      <button
+        v-else
+        class="btn btn-success"
+        @click="onEdit"
+      >
+        Edit
+      </button>
+    </div>
+
+    <div class="card pmd-card">
       <div class="card-body">
-        <h4 class="card-title">ID: {{ item.id }}</h4>
-        <p class="card-text">{{ item.value }}</p>
+        <form
+          class="p-5 col-6 mx-auto"
+          @submit.prevent="onUpdate"
+        >
+          <p class="h4 mb-4">ID: {{ id }}</p>
+
+          <div v-if="errors" class="text-danger text-left">
+            <ul>
+              <li v-for="msg in errors" :key="msg">{{ msg }}</li>
+            </ul>
+          </div>
+
+          <label for="editFormValue">Value</label>
+          <input
+            type="text"
+            id="editFormValue"
+            class="form-control"
+            name="value"
+            placeholder="Value"
+            :disabled="!isEditing"
+            v-model="editForm.value"
+          >
+
+          <button
+            v-if="isEditing"
+            type="submit"
+            class="btn btn-info btn-block my-4 text-white"
+          >
+            更新
+          </button>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-const api = require('../api')
+import axios from 'axios'
 
 export default {
-  data: () => ({
-    item: {
-      id: '',
-      value: ''
-    }
-  }),
   mixins: [
     // HTTPステータスチェックmixin
-    require('../mixins/statusCodeCheck').default
+    require('../mixins/statusCodeCheck').default,
+    // ローダーmixin
+    require('../mixins/loader').default
   ],
+  data: () => ({
+    editForm: {
+      value: ''
+    },
+    isEditing: false,
+    errors: []
+  }),
   props: {
     id: {
       type: String,
@@ -31,16 +88,78 @@ export default {
   },
   methods: {
     async load () {
-      const response = await api.getDetail('tests', this.id)
+      this.showLoader()
 
-      this.checkGetResponseStatusCode(response.status)
+      try {
+        const response = await axios.get(`/api/tests/${this.id}`)
+        const success = this.checkStatusCode200(response.status)
 
-      this.item.id = response.data.id
-      this.item.value = response.data.value
+        if (success) {
+          this.editForm.id = response.data.id
+          this.editForm.value = response.data.value
+        }
+      } catch (e) {
+        alert('データを読み込めませんでした。')
+      } finally {
+        this.hideLoader()
+      }
+    },
+    onEdit () {
+      this.isEditing = true
+    },
+    async onUpdate () {
+      this.showLoader()
+
+      try {
+        // APIに渡すデータ
+        let apiParams = {}
+        apiParams = {
+          value: this.editForm.value
+        }
+        const response = await axios.patch('/api/tests/' + this.id, apiParams)
+        const success = this.checkStatusCode200(response.status)
+
+        if (success) {
+          this.isEditing = false
+        } else {
+          this.errors = response.data.errors.value
+        }
+      } catch (e) {
+        alert('NG')
+      } finally {
+        this.hideLoader()
+      }
+    },
+    async onDelete () {
+      this.showLoader()
+
+      try {
+        const response = await axios.delete('/api/tests/' + this.id)
+        const success = this.checkStatusCode200(response.status)
+
+        if (success) {
+          // トップページに遷移
+          this.$router.push('/')
+        }
+      } catch (e) {
+        alert('NG')
+      } finally {
+        this.hideLoader()
+      }
+    },
+    onCancel () {
+      this.isEditing = false
+      this.load()
+    },
+    clearError () {
+      this.errors = null
     }
   },
   mounted () {
     this.load()
+  },
+  created () {
+    this.clearError()
   }
 }
 </script>

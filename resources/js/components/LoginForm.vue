@@ -5,7 +5,7 @@
   >
     <p class="h4 mb-4">ログイン</p>
 
-    <div v-if="loginErrors" class="errors">
+    <div v-if="loginErrors" class="text-danger text-left">
       <ul v-if="loginErrors.email">
         <li v-for="msg in loginErrors.email" :key="msg">{{ msg }}</li>
       </ul>
@@ -85,6 +85,9 @@ export default {
     clearError () {
       this.$store.commit('auth/setLoginErrorMessages', null)
     }
+  },
+  created () {
+    this.clearError()
   }
 }
 </script>

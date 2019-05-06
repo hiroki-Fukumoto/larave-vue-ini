@@ -4,6 +4,8 @@ import VueRouter from 'vue-router'
 import Login from './pages/Login.vue'
 import ExampleList from './pages/ExampleList.vue'
 import ExampleDetail from './pages/ExampleDetail.vue'
+import ExampleCreate from './pages/ExampleCreate.vue'
+import ExampleEdit from './pages/ExampleEdit.vue'
 import SystemError from './pages/errors/System.vue'
 import NotFound from './pages/errors/NotFound.vue'
 
@@ -31,6 +33,17 @@ const routes = [
   {
     path: '/items/:id',
     component: ExampleDetail,
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/new',
+    component: ExampleCreate,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/items/edit/:id',
+    component: ExampleEdit,
     props: true,
     meta: { requiresAuth: true }
   },

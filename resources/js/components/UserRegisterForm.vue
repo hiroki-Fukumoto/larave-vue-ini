@@ -5,7 +5,7 @@
   >
       <p class="h4 mb-4">新規登録</p>
 
-      <div v-if="registerErrors" class="errors">
+      <div v-if="registerErrors" class="text-danger text-left">
         <ul v-if="registerErrors.name">
           <li v-for="msg in registerErrors.name" :key="msg">{{ msg }}</li>
         </ul>

@@ -1,5 +1,4 @@
 <template>
-  <!--Fixed tab example -->
   <div class="card pmd-card">
     <div class="pmd-tabs">
         <ul role="tablist" class="nav nav-tabs nav-fill">
@@ -17,21 +16,21 @@
             <LoginForm />
           </div>
           <div role="tabpanel" class="tab-pane" id="about-fixed">
-            <RegisterForm />
+            <UserRegisterForm />
           </div>
         </div>
     </div>
-  </div> <!--Fixed tab example end-->
+  </div>
 </template>
 
 <script>
 import LoginForm from '../components/LoginForm.vue'
-import RegisterForm from '../components/RegisterForm.vue'
+import UserRegisterForm from '../components/UserRegisterForm.vue'
 
 export default {
   components: {
     LoginForm,
-    RegisterForm
+    UserRegisterForm
   },
   data () {
     return {
